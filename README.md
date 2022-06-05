@@ -1,7 +1,7 @@
 # fastapi-graphql-tortoise-orm
 
 To run the app  
-## `python uvicorn main:app --reload`  
+## `python uvicorn main:app`  
 > ### `asaID: ChoieCoin`   
 Anything else will give an error
 

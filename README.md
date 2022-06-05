@@ -5,6 +5,11 @@ To run the app
 > ### `asaID: ChoieCoin`   
 Anything else will give an error
 
+# Screenshots  
+  
+![screenshot-1](https://github.com/Iambusayor/fastapi-graphql-tortoise-orm/blob/main/Screenshot_1.png?raw=true) 
+  
+![screenshot-1](https://github.com/Iambusayor/fastapi-graphql-tortoise-orm/blob/main/Screenshot_2.png?raw=true) 
 
 ### Todo
 * Add exceptions to properly handle errors

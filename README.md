@@ -1,6 +1,10 @@
 # fastapi-graphql-tortoise-orm
 
-## Todo
+To run the app  
+>`python uvicorn main:app --reload
+`
+
+### Todo
 * Add exceptions to properly handle errors
 * Add new features like: 
   * date range 
@@ -12,3 +16,4 @@
 * Add mutations
 * Explore Strawberry-pydantic
 * Begin Testing
+* Dockerize it all 

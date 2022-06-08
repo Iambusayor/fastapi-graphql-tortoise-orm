@@ -48,6 +48,7 @@ async def get_tweets(asaID: str) -> twitter.TwitterOverAll:
 
 async def get_reddit(asaID: str) -> reddit.Reddit:
     post_result = await RedditPostTable.filter(asa_id=asaID).values()
+    print(post_result)
     post_result = {key: [i[key] for i in post_result] for key in post_result[0]}
     post_result = AttrDict(post_result)
     # if not post_result:

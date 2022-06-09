@@ -1,13 +1,6 @@
-from typing import List
-from fastapi import status, HTTPException
-
 import strawberry
 from .definitions import twitter, reddit, github
 from main.models import (
-    Twitter_Pydantic,
-    Github_Pydantic,
-    Comment_Pydantic,
-    Post_Pydantic,
     Twitter,
     RedditCommentTable,
     RedditPostTable,
@@ -29,7 +22,9 @@ class All:
 
 
 async def get_tweets(asaID: str) -> twitter.TwitterOverAll:
-    result = await Twitter.filter(asa_id=asaID).values()
+    result = await Twitter.filter(asa_id=asaID).values(
+        "tweet_id", "tweet", "posted_at", "likes", "retweets", "sentiment_score"
+    )
     result = {key: [i[key] for i in result] for key in result[0]}
     result = AttrDict(result)
     # if not result:
@@ -103,15 +98,6 @@ async def get_github(asaID: str) -> github.GithubOverAll:
     )
 
 
-# def getAllData(asaID: str) -> All:
-#     return All(twitter=get_tweets(asaID=asaID), reddit=get_reddit(asaID=asaID), github=get_github(asaID=asaID))
-
-
-# @strawberry.type
-# class Query:
-#     get_all: All = strawberry.field(resolver=getAllData)
-
-
 @strawberry.type
 class Query:
     @strawberry.field
@@ -121,6 +107,3 @@ class Query:
             reddit=get_reddit(asaID=asaID),
             github=get_github(asaID=asaID),
         )
-
-
-schema = strawberry.Schema(query=Query)

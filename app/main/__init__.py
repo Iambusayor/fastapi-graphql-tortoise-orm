@@ -3,13 +3,14 @@ from tortoise.contrib.fastapi import register_tortoise
 from strawberry.asgi import GraphQL
 import strawberry
 from api.query import Query
+from api.mutation import Mutation
 
 DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/test"
 # DATABASE_URL = "postgres://postgres:@127.0.0.1:5432/test_db"
 
 app = FastAPI()
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)
 
 graphql_app = GraphQL(schema)
 app.add_route("/analytics", graphql_app)

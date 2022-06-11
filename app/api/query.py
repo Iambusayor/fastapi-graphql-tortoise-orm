@@ -1,4 +1,6 @@
 import strawberry
+import datetime
+from typing import Optional
 from .definitions import twitter, reddit, github
 from main.models import (
     Twitter,
@@ -21,9 +23,17 @@ class All:
     github: github.GithubOverAll
 
 
-async def get_tweets(asaID: str) -> twitter.TwitterOverAll:
-    result = await Twitter.filter(asa_id=asaID).values(
-        "tweet_id", "tweet", "posted_at", "likes", "retweets", "sentiment_score"
+async def get_tweets(
+    asaID: str,
+    startDate: str,
+    endDate: str,
+) -> twitter.TwitterOverAll:
+    result = (
+        await Twitter.filter(asa_id=asaID)
+        .filter(posted_at__range=[startDate, endDate])
+        .values(
+            "tweet_id", "tweet", "posted_at", "likes", "retweets", "sentiment_score"
+        )
     )
     result = {key: [i[key] for i in result] for key in result[0]}
     result = AttrDict(result)
@@ -41,8 +51,16 @@ async def get_tweets(asaID: str) -> twitter.TwitterOverAll:
     )
 
 
-async def get_reddit(asaID: str) -> reddit.Reddit:
-    post_result = await RedditPostTable.filter(asa_id=asaID).values()
+async def get_reddit(
+    asaID: str,
+    startDate: str,
+    endDate: str,
+) -> reddit.Reddit:
+    post_result = (
+        await RedditPostTable.filter(asa_id=asaID)
+        .filter(posted_at__range=[startDate, endDate])
+        .values()
+    )
     print(post_result)
     post_result = {key: [i[key] for i in post_result] for key in post_result[0]}
     post_result = AttrDict(post_result)
@@ -101,9 +119,14 @@ async def get_github(asaID: str) -> github.GithubOverAll:
 @strawberry.type
 class Query:
     @strawberry.field
-    def analytics(self, asaID: str) -> All:
+    def analytics(
+        self,
+        asaID: str,
+        startDate: Optional[str] = datetime.date.today() - datetime.timedelta(days=30),
+        endDate: Optional[str] = datetime.date.today(),
+    ) -> All:
         return All(
-            twitter=get_tweets(asaID=asaID),
-            reddit=get_reddit(asaID=asaID),
+            twitter=get_tweets(asaID=asaID, startDate=startDate, endDate=endDate),
+            reddit=get_reddit(asaID=asaID, startDate=startDate, endDate=endDate),
             github=get_github(asaID=asaID),
         )

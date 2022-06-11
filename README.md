@@ -14,13 +14,13 @@ Anything else will give an error
 ### Todo
 - [ ] Add exceptions to properly handle errors
 - Add new features like: 
-  - [ ] date range 
+  - [x] date range 
   - [ ] hour
   - [ ] day
 - [x] Use migrations
 - [x] Add more data to the db
 - [ ] improve output structure
-- [ ] Add mutations
+- [x] Add mutations
 - [ ] Explore Strawberry-pydantic
 - [ ] Begin Testing
 - [ ] Dockerize it all 

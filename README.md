@@ -12,15 +12,15 @@ Anything else will give an error
 ![screenshot-1](https://github.com/Iambusayor/fastapi-graphql-tortoise-orm/blob/main/Screenshot_2.png?raw=true) 
 
 ### Todo
-- [ ] Add exceptions to properly handle errors
 - Add new features like: 
   - [x] date range 
   - [ ] hour
   - [ ] day
 - [x] Use migrations
 - [x] Add more data to the db
-- [ ] improve output structure
 - [x] Add mutations
+- [x] Begin Testing
+- [ ] Add exceptions to properly handle errors
+- [ ] improve output structure
 - [ ] Explore Strawberry-pydantic
-- [ ] Begin Testing
 - [ ] Dockerize it all 

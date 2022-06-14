@@ -35,6 +35,7 @@ async def get_tweets(
             "tweet_id", "tweet", "posted_at", "likes", "retweets", "sentiment_score"
         )
     )
+
     result = {key: [i[key] for i in result] for key in result[0]}
     result = AttrDict(result)
     # if not result:
@@ -58,7 +59,7 @@ async def get_reddit(
 ) -> reddit.Reddit:
     post_result = (
         await RedditPostTable.filter(asa_id=asaID)
-        .filter(posted_at__range=[startDate, endDate])
+        .filter(time_created__range=[startDate, endDate])
         .values()
     )
     print(post_result)

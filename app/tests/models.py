@@ -1,8 +1,13 @@
 from tortoise.models import Model
 from tortoise import fields
+from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class Twitter(Model):
+    """
+    Twitter model
+    """
+
     tweet_id = fields.BigIntField(pk=True)
     tweet = fields.TextField()
     posted_at = fields.DatetimeField(auto_now_add=False)
@@ -14,9 +19,18 @@ class Twitter(Model):
     class Meta:
         table = "twitterTable"
 
+    class PydanticMeta:
+        exclude = ["asa_id"]
+
+
+Twitter_Pydantic = pydantic_model_creator(
+    Twitter,
+    name="twitterPydantic",
+)
+
 
 class RedditPostTable(Model):
-    post_id = fields.CharField(pk=True, max_length=10)
+    post_id = fields.CharField(pk=True, max_length=255)
     title = fields.TextField()
     text = fields.TextField()
     score = fields.IntField()
@@ -29,24 +43,39 @@ class RedditPostTable(Model):
     class Meta:
         table = "redditPostTable"
 
+    class PydanticMeta:
+        exclude = ["asa_id"]
+
+
+Post_Pydantic = pydantic_model_creator(
+    RedditPostTable,
+    name="postsPydantic",
+)
+
 
 class RedditCommentTable(Model):
-    comment_id = fields.CharField(pk=True, max_length=10)
+    comment_id = fields.CharField(pk=True, max_length=255)
     body = fields.TextField()
     score = fields.IntField()
     time_created = fields.DatetimeField(auto_now_add=False)
     sentiment_score = fields.FloatField()
-    post_id = fields.ForeignKeyField("models.RedditPostTable", related_name="post_id")
+    post = fields.ForeignKeyField("models.RedditPostTable", related_name="parent_id")
 
     class Meta:
         table = "redditCommentTable"
+
+
+Comment_Pydantic = pydantic_model_creator(
+    RedditCommentTable,
+    name="commentsPydantic",
+)
 
 
 class Github(Model):
     repo_name = fields.CharField(pk=True, max_length=255)
     repo_desc = fields.TextField()
     date_created = fields.DatetimeField(auto_now_add=False)
-    last_date = fields.DatetimeField(auto_now_add=False)
+    last_push_date = fields.DatetimeField(auto_now_add=False)
     language = fields.CharField(max_length=100)
     no_of_forks = fields.IntField()
     no_of_stars = fields.IntField()
@@ -59,3 +88,20 @@ class Github(Model):
 
     class Meta:
         table = "githubTable"
+
+    class PydanticMeta:
+        exclude = ["asa_id"]
+
+
+Github_Pydantic = pydantic_model_creator(
+    Github,
+    name="githubPydantic",
+)
+
+
+def switch_to_test_mode():
+    global TORTOISE_ORM, generate_schemas
+    TORTOISE_ORM["connections"][
+        "default"
+    ] = "postgres://postgres:password@127.0.0.1:5432/test_{}"
+    generate_schemas = True

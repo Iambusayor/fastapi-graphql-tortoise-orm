@@ -35,11 +35,12 @@ async def get_tweets(
             "tweet_id", "tweet", "posted_at", "likes", "retweets", "sentiment_score"
         )
     )
-
+    if not result:
+        raise Exception(
+            f"No data available for this ASA: '{asaID}'.Check ASA-ID and dates are valid!"
+        )
     result = {key: [i[key] for i in result] for key in result[0]}
     result = AttrDict(result)
-    # if not result:
-    #     return f"not found!"
     print(result)
     return twitter.TwitterOverAll(
         asaID=asaID,
@@ -62,13 +63,13 @@ async def get_reddit(
         .filter(time_created__range=[startDate, endDate])
         .values()
     )
+    if not post_result:
+        raise Exception(
+            f"No data available for this ASA: '{asaID}'. Check ASA-ID and dates are valid!"
+        )
     print(post_result)
     post_result = {key: [i[key] for i in post_result] for key in post_result[0]}
     post_result = AttrDict(post_result)
-    # if not post_result:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND, detail=f"{asaID} not found!"
-    #     )
     post_result_id = post_result["post_id"][0]
     comment_result = await RedditCommentTable.filter(post_id=post_result_id).values()
     print(comment_result)
@@ -97,12 +98,12 @@ async def get_reddit(
 
 async def get_github(asaID: str) -> github.GithubOverAll:
     result = await Github.filter(asa_id=asaID).values()
+    if not result:
+        raise Exception(
+            f"No data available for this ASA: '{asaID}'.Check ASA-ID and dates are valid!"
+        )
     result = {key: [i[key] for i in result] for key in result[0]}
     result = AttrDict(result)
-    # if not result:
-    # raise HTTPException(
-    # status_code=status.HTTP_404_NOT_FOUND, detail=f"{asaID} not found!"
-    # )
     return github.GithubOverAll(
         asaID=asaID,
         language=result.language,

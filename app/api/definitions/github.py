@@ -6,18 +6,18 @@ import strawberry
 
 @strawberry.type
 class Github:
-    repo_name: List[str]
-    repo_desc: List[str]
-    date_created: List[datetime]
-    last_push_date: List[datetime]
-    language: List[str]
-    no_of_forks: List[int]
-    no_of_stars: List[int]
-    no_of_watches: List[int]
-    no_of_contributors: List[int]
-    no_of_commits: List[int]
-    issues: List[int]
-    pull_requests: List[int]
+    repo_name: str
+    repo_desc: str
+    date_created: datetime
+    last_push_date: datetime
+    language: str
+    no_of_forks: int
+    no_of_stars: int
+    no_of_watches: int
+    no_of_contributors: int
+    no_of_commits: int
+    issues: int
+    pull_requests: int
 
 
 @strawberry.type
@@ -31,4 +31,4 @@ class GithubOverAll:
     commitsTotal: int
     isssuesTotal: int
     pullRequestTotal: int
-    repos: Github
+    repos: List[Github]

@@ -1,5 +1,6 @@
 import strawberry
 import datetime
+from dacite import from_dict
 from typing import Optional
 from .definitions import twitter, reddit, github
 from main.models import (
@@ -39,16 +40,16 @@ async def get_tweets(
         raise Exception(
             f"No data available for this ASA: '{asaID}'.Check ASA-ID and dates are valid!"
         )
-    result = {key: [i[key] for i in result] for key in result[0]}
-    result = AttrDict(result)
+    result_ = {key: [i[key] for i in result] for key in result[0]}
+    result = [from_dict(data_class=twitter.Twitter, data=x) for x in result]
     print(result)
     return twitter.TwitterOverAll(
         asaID=asaID,
-        tweetsTotal=len(result["tweet"]),
-        likesTotal=sum(result["likes"]),
-        retweetsTotal=sum(result["retweets"]),
-        sentimentScoreMean=sum(result["sentiment_score"])
-        / len(result["sentiment_score"]),
+        tweetsTotal=len(result_["tweet"]),
+        likesTotal=sum(result_["likes"]),
+        retweetsTotal=sum(result_["retweets"]),
+        sentimentScoreMean=sum(result_["sentiment_score"])
+        / len(result_["sentiment_score"]),
         tweets=result,
     )
 
@@ -61,17 +62,32 @@ async def get_reddit(
     post_result = (
         await RedditPostTable.filter(asa_id=asaID)
         .filter(time_created__range=[startDate, endDate])
-        .values()
+        .values(
+            "post_id",
+            "title",
+            "text",
+            "score",
+            "num_of_comments",
+            "time_created",
+            "url",
+            "sentiment_score",
+        )
     )
     if not post_result:
         raise Exception(
             f"No data available for this ASA: '{asaID}'. Check ASA-ID and dates are valid!"
         )
-    print(post_result)
     post_result = {key: [i[key] for i in post_result] for key in post_result[0]}
     post_result = AttrDict(post_result)
     post_result_id = post_result["post_id"][0]
-    comment_result = await RedditCommentTable.filter(post_id=post_result_id).values()
+    comment_result = await RedditCommentTable.filter(post_id=post_result_id).values(
+        "comment_id",
+        "body",
+        "score",
+        "time_created",
+        "sentiment_score",
+        "post_id",
+    )
     print(comment_result)
     comment_result = {
         key: [i[key] for i in comment_result] for key in comment_result[0]
@@ -97,23 +113,36 @@ async def get_reddit(
 
 
 async def get_github(asaID: str) -> github.GithubOverAll:
-    result = await Github.filter(asa_id=asaID).values()
+    result = await Github.filter(asa_id=asaID).values(
+        "repo_name",
+        "repo_desc",
+        "date_created",
+        "last_push_date",
+        "language",
+        "no_of_forks",
+        "no_of_stars",
+        "no_of_watches",
+        "no_of_contributors",
+        "no_of_commits",
+        "issues",
+        "pull_requests",
+    )
     if not result:
         raise Exception(
             f"No data available for this ASA: '{asaID}'.Check ASA-ID and dates are valid!"
         )
-    result = {key: [i[key] for i in result] for key in result[0]}
-    result = AttrDict(result)
+    result_ = {key: [i[key] for i in result] for key in result[0]}
+    result = [from_dict(data_class=github.Github, data=x) for x in result]
     return github.GithubOverAll(
         asaID=asaID,
-        language=result.language,
-        forksTotal=sum(result.no_of_forks),
-        starsTotal=sum(result.no_of_stars),
-        watchesTotal=sum(result.no_of_watches),
-        contributorsTotal=sum(result.no_of_contributors),
-        commitsTotal=sum(result.no_of_commits),
-        isssuesTotal=sum(result.issues),
-        pullRequestTotal=sum(result.pull_requests),
+        language=result_["language"],
+        forksTotal=sum(result_["no_of_forks"]),
+        starsTotal=sum(result_["no_of_stars"]),
+        watchesTotal=sum(result_["no_of_watches"]),
+        contributorsTotal=sum(result_["no_of_contributors"]),
+        commitsTotal=sum(result_["no_of_commits"]),
+        isssuesTotal=sum(result_["issues"]),
+        pullRequestTotal=sum(result_["pull_requests"]),
         repos=result,
     )
 

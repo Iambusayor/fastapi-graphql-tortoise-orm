@@ -5,7 +5,7 @@ import strawberry
 from api.query import Query
 from api.mutation import Mutation
 
-DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/test"
+DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/mock"
 
 
 def init(app: FastAPI):
